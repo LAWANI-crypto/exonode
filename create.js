@@ -1,20 +1,38 @@
 const http = require("http");
 
 const tasks = [];
+const STATES = ["fait", "en attente", "en cours", "non faits"];
 
 const server = http.createServer((req, res) => {
-  if (req.url === "/task" && req.method === "POST") {
+  if (req.url === "/tasks" && req.method === "POST") {
     let body = "";
     let task;
     req.on("data", (chunk) => {
       body += chunk;
     });
-    req.on("end", () => {
+    req.on("end", () => { 
       task = JSON.parse(body);
 
-      tasks.push(task);
-      res.writeHead(201, { "Content-Type": "application/json" });
-      res.end(JSON.stringify(tasks));
+      const isValidObject =
+      typeof task === "object" &&
+      task !== null
+
+      const hasRequiredKeys =
+          "id" in task &&
+          "title" in task &&
+          "status" in task;
+
+        const isValidStatus =
+          STATES.includes(task.status);
+
+      if (isValidObject && hasRequiredKeys && isValidStatus ) {
+        tasks.push(task);
+        res.writeHead(201, { "Content-Type": "application/json" });
+        res.end(JSON.stringify(tasks));
+      }else {
+        res.writeHead(400, { "Content-Type": "application/json" });
+        res.end(   JSON.stringify({ error: "Objet invalide" }))
+      }     
     });
   } else if (req.url === "/tasks" && req.method === "GET") {
     res.writeHead(200, {
