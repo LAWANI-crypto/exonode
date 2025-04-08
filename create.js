@@ -1,7 +1,7 @@
 const http = require("http");
 
 const tasks = [];
-const STATES = ["fait", "en attente", "en cours", "non faits"];
+const STATES = ["done", "onhold", "pending", "undone"];
 
 const server = http.createServer((req, res) => {
   if (req.url === "/tasks" && req.method === "POST") {
@@ -11,7 +11,15 @@ const server = http.createServer((req, res) => {
       body += chunk;
     });
     req.on("end", () => { 
+     try {
       task = JSON.parse(body);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ message: 'JSON reçu !' }));
+    } catch (error) {
+      res.writeHead(400, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'JSON invalide' }));
+    }
+      
 
       const isValidObject =
       typeof task === "object" &&
