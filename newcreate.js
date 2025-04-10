@@ -32,15 +32,16 @@ app.post("/tasks", (req, res) => {
   }
 });
 
+//Affichage du tableau de taches
+app.get("/tasks", (req, res) => {
+  res.status(200).json(tasks);
+});
+
 //intercepte l'erreur lors d'une connexion au mauvais serveur
 app.use((req, res) => {
   res.status(404).json({ error: "Not Found" });
 });
 
-//Affichage du tableau de taches
-app.get("/tasks", (req, res) => {
-  res.status(200).json(tasks);
-});
 
 //Server
 const port = 3000;
